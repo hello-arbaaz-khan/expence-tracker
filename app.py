@@ -22,6 +22,16 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/terms-and-conditions")
+def terms_and_conditions():
+    return render_template("terms_and_conditions.html")
+
+
+@app.route("/privacy-policy")
+def privacy_policy():
+    return render_template("privacy_policy.html")
+
+
 # ------------------------------------------------------------------ #
 # Placeholder routes — students will implement these                  #
 # ------------------------------------------------------------------ #
@@ -42,12 +52,12 @@ def add_expense():
 
 
 @app.route("/expenses/<int:id>/edit")
-def edit_expense(id):
+def edit_expense(_id):
     return "Edit expense — coming in Step 8"
 
 
 @app.route("/expenses/<int:id>/delete")
-def delete_expense(id):
+def delete_expense(_id):
     return "Delete expense — coming in Step 9"
 
 
