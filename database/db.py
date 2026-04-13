@@ -64,6 +64,30 @@ def init_db():
     conn.close()
 
 
+def create_user(name, email, password):
+    """
+    Creates a new user with the given name, email, and password.
+    Hashes the password before storing.
+    Returns the new user's id.
+    Raises sqlite3.IntegrityError if email already exists.
+    """
+    conn = sqlite3.connect(DATABASE)
+    conn.execute("PRAGMA foreign_keys = ON")
+    cursor = conn.cursor()
+
+    password_hash = generate_password_hash(password)
+    cursor.execute("""
+        INSERT INTO users (name, email, password_hash)
+        VALUES (?, ?, ?)
+    """, (name, email, password_hash))
+
+    user_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+
+    return user_id
+
+
 def seed_db():
     """
     Inserts sample data for development.
@@ -120,3 +144,7 @@ def init_app(app):
         init_db()
         seed_db()
         print("Database initialized and seeded.")
+
+
+# Export create_user for use in app.py
+__all__ = ["get_db", "close_db", "init_db", "seed_db", "create_user", "init_app"]

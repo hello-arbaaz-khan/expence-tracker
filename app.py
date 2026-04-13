@@ -1,8 +1,23 @@
-from flask import Flask, render_template
-from database.db import init_app, init_db, seed_db
+import re
+import sqlite3
+from flask import Flask, render_template, request, redirect, url_for, flash
+from database.db import init_app, init_db, seed_db, create_user
 
 app = Flask(__name__)
+app.secret_key = "dev-secret-key"
 init_app(app)
+
+
+# ------------------------------------------------------------------ #
+# Helper functions                                                    #
+# ------------------------------------------------------------------ #
+
+def is_valid_email(email):
+    """
+    Validates email format using a simple regex pattern.
+    """
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
 # Initialize database on startup
 with app.app_context():
@@ -19,8 +34,41 @@ def landing():
     return render_template("landing.html")
 
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        # Get form data
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        # Validate input
+        if not name:
+            flash("Name is required", "error")
+            return redirect(url_for("register"))
+        if not email:
+            flash("Email is required", "error")
+            return redirect(url_for("register"))
+        if not is_valid_email(email):
+            flash("Invalid email format", "error")
+            return redirect(url_for("register"))
+        if len(password) < 8:
+            flash("Password must be at least 8 characters", "error")
+            return redirect(url_for("register"))
+        if password != confirm_password:
+            flash("Passwords do not match", "error")
+            return redirect(url_for("register"))
+
+        # Create user
+        try:
+            create_user(name, email, password)
+            flash("Account created successfully! Please log in.", "success")
+            return redirect(url_for("login"))
+        except sqlite3.IntegrityError:
+            flash("Email already registered", "error")
+            return redirect(url_for("register"))
+
     return render_template("register.html")
 
 
@@ -69,4 +117,4 @@ def delete_expense(_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)
