@@ -64,6 +64,48 @@ def init_db():
     conn.close()
 
 
+def get_user_by_id(user_id):
+    """
+    Fetches a user from the database by id.
+    Returns a dict with id, name, email if found, None otherwise.
+    """
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, name, email FROM users WHERE id = ?
+    """, (user_id,))
+
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        return dict(row)
+    return None
+
+
+def get_user_by_email(email):
+    """
+    Fetches a user from the database by email.
+    Returns a dict with id, name, email, password_hash if found, None otherwise.
+    """
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, name, email, password_hash FROM users WHERE email = ?
+    """, (email,))
+
+    row = cursor.fetchone()
+    conn.close()
+
+    if row:
+        return dict(row)
+    return None
+
+
 def create_user(name, email, password):
     """
     Creates a new user with the given name, email, and password.
@@ -146,5 +188,5 @@ def init_app(app):
         print("Database initialized and seeded.")
 
 
-# Export create_user for use in app.py
-__all__ = ["get_db", "close_db", "init_db", "seed_db", "create_user", "init_app"]
+# Export functions for use in app.py
+__all__ = ["get_db", "close_db", "init_db", "seed_db", "create_user", "get_user_by_email", "get_user_by_id", "init_app"]
