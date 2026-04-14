@@ -6,7 +6,11 @@
 
 <section class="hero">
     <div class="hero-inner">
-        <div class="hero-badge">Personal Finance Tracker</div>
+        {% if current_user %}
+            <div class="hero-badge">Welcome back, {{ current_user.name }}!</div>
+        {% else %}
+            <div class="hero-badge">Personal Finance Tracker</div>
+        {% endif %}
         <h1 class="hero-title">
             Know where your<br>
             <em>money goes</em>
