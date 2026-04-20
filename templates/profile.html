@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Profile — Spendly{% endblock %}
+
+{% block content %}
+
+<section class="terms-section">
+    <div class="terms-container">
+        <h1 class="terms-heading">Profile</h1>
+        <p class="terms-intro">Manage your account and view your spending overview</p>
+
+        <!-- Section 1: User Info Card -->
+        <div class="profile-user-card">
+            <div class="profile-avatar">
+                {{ user.name[0] }}{{ user.name.split()[-1][0] if ' ' in user.name else user.name[1] }}
+            </div>
+            <div class="profile-user-info">
+                <h2 class="profile-user-name">{{ user.name }}</h2>
+                <p class="profile-user-email">{{ user.email }}</p>
+                <p class="profile-user-since">
+                    <i data-lucide="calendar" class="icon-sm"></i>
+                    Member since {{ user.member_since }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Section 2: Summary Stats -->
+        <h2 class="profile-section-title">Spending Overview</h2>
+        <div class="profile-stats">
+            <div class="profile-stat-card">
+                <div class="profile-stat-icon">
+                    <i data-lucide="wallet"></i>
+                </div>
+                <div class="profile-stat-value">₹{{ "%.2f"|format(stats.total_spent) }}</div>
+                <div class="profile-stat-label">Total Spent</div>
+            </div>
+            <div class="profile-stat-card">
+                <div class="profile-stat-icon">
+                    <i data-lucide="list"></i>
+                </div>
+                <div class="profile-stat-value">{{ stats.transaction_count }}</div>
+                <div class="profile-stat-label">Transactions</div>
+            </div>
+            <div class="profile-stat-card">
+                <div class="profile-stat-icon">
+                    <i data-lucide="pie-chart"></i>
+                </div>
+                <div class="profile-stat-value">{{ stats.top_category }}</div>
+                <div class="profile-stat-label">Top Category</div>
+            </div>
+        </div>
+
+        <!-- Section 3: Transaction History -->
+        <h2 class="profile-section-title">Recent Transactions</h2>
+        <div class="profile-table-container">
+            <table class="profile-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.date }}</td>
+                        <td>{{ transaction.description }}</td>
+                        <td>
+                            <span class="profile-category-badge">{{ transaction.category }}</span>
+                        </td>
+                        <td class="profile-table-amount">₹{{ "%.2f"|format(transaction.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 4: Category Breakdown -->
+        <h2 class="profile-section-title">Category Breakdown</h2>
+        <div class="profile-categories">
+            {% for category in categories %}
+            <div class="profile-category-row">
+                <div class="profile-category-info">
+                    <span class="profile-category-name">{{ category.name }}</span>
+                    <span class="profile-category-amount">₹{{ "%.2f"|format(category.total) }}</span>
+                </div>
+                <div class="profile-category-bar-track">
+                    <div class="profile-category-bar" style="width: {{ category.percentage }}%"></div>
+                </div>
+                <div class="profile-category-percent">{{ category.percentage }}%</div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    lucide.createIcons();
+</script>
+{% endblock %}
