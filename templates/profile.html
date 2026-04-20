@@ -87,7 +87,7 @@
                     <span class="profile-category-amount">₹{{ "%.2f"|format(category.total) }}</span>
                 </div>
                 <div class="profile-category-bar-track">
-                    <div class="profile-category-bar" style="width: {{ category.percentage }}%"></div>
+                    <div class="profile-category-bar" :style="{ width: category.percentage + '%' }"></div>
                 </div>
                 <div class="profile-category-percent">{{ category.percentage }}%</div>
             </div>
