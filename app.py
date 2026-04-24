@@ -2,7 +2,7 @@ import re
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
-from database.db import init_app, init_db, seed_db, create_user, get_user_by_email, get_user_by_id
+from database.db import init_app, init_db, seed_db, create_user, get_user_by_email, get_user_by_id, get_user_profile, get_summary_stats, get_recent_transactions, get_category_breakdown
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"
@@ -150,36 +150,13 @@ def profile():
     if not session.get("user_id"):
         return redirect(url_for("login"))
 
-    # Hardcoded data for Step 4 (Step 5 will query DB)
-    user = {
-        "name": "Demo User",
-        "email": "demo@spendly.com",
-        "member_since": "April 2026"
-    }
+    user_id = session["user_id"]
 
-    # Summary stats (hardcoded)
-    stats = {
-        "total_spent": 423.99,
-        "transaction_count": 8,
-        "top_category": "Food"
-    }
-
-    # Recent transactions (hardcoded)
-    transactions = [
-        {"date": "2026-04-09", "description": "Coffee shop", "category": "Food", "amount": 12.50},
-        {"date": "2026-04-08", "description": "Gym membership", "category": "Health", "amount": 50.00},
-        {"date": "2026-04-07", "description": "Restaurant dinner", "category": "Food", "amount": 65.00},
-        {"date": "2026-04-05", "description": "Electric bill", "category": "Bills", "amount": 120.00},
-    ]
-
-    # Category breakdown (hardcoded)
-    categories = [
-        {"name": "Food", "total": 163.49, "percentage": 39},
-        {"name": "Transport", "total": 75.00, "percentage": 18},
-        {"name": "Bills", "total": 120.00, "percentage": 28},
-        {"name": "Health", "total": 50.00, "percentage": 12},
-        {"name": "Entertainment", "total": 15.99, "percentage": 3},
-    ]
+    # Fetch real data from database
+    user = get_user_profile(user_id)
+    stats = get_summary_stats(user_id)
+    transactions = get_recent_transactions(user_id)
+    categories = get_category_breakdown(user_id)
 
     return render_template("profile.html",
                           user=user,
